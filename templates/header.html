@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <!-- Add your custom CSS here -->
+    <style>
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    nav ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+  }
+
+  nav ul li {
+      display: inline;
+      margin-left: 20px;
+  }
+
+  nav ul li a {
+      color: #fff;
+      text-decoration: none;
+  }
+  </style>
+</head>
+<body>
+    <header>
+        <!-- Your header content here -->
+        <nav class="navbar navbar-dark bg-dark fixed-top">
+            <span class="navbar-brand mb-0 h1">QuickCart</span>
+            <!-- Icons aligned to the right -->
+            <nav>
+              <ul>
+                  <li><a href="/home">Home</a></li>
+                  <li><a href="/about">About</a></li>
+                  <li><a href="/contact">Contact</a></li>
+                  <li><a href="/promotions">Offers</a></li>
+              </ul>
+          </nav>
+            <div class="ml-auto">
+                <!-- Cart Icon -->
+                <!-- <a href="/cancelled_orders">Cancelled Orders</a> -->
+                <a href="/cancelled_orders" class="btn btn-link text-white">
+                 Cancelled Orders
+              </a>
+                <a href="/cart" class="btn btn-link text-white" id="openCartModal">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="/orderplaced" class="btn btn-link text-white" id="orderplaced">
+                <i class="fas fa-box-open"></i> 
+                </a>
+                <!-- Login Icon -->
+                <a href="#" class="btn btn-link text-white" id="openUserModal">
+                    <i class="fas fa-user"></i> <!-- Assuming you're using Font Awesome for icons -->
+                </a>
+            </div>
+        </nav>
+    </header>
+
+<!-- User Detail Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userModalLabel">Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- User details will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <!-- Add signout icon here -->
+        <a href="/" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+      // Open User Detail Modal
+      $('#openUserModal').on('click', function(e) {
+          e.preventDefault();
+          console.log("User icon clicked"); // Debugging
+          $('#userModal .modal-body').load('/user_details');
+          console.log("User modal body loaded"); // Debugging
+          $('#userModal').modal('show');
+          console.log("User modal shown"); // Debugging
+      });
+  });
+  </script>
+  
+<!-- Add your custom JavaScript here -->
+</body>
+</html>

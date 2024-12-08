@@ -1,0 +1,105 @@
+{% include 'header.html' %}
+<style>
+    .card {
+        height: 92%; /* Set height of card */
+    }
+    .card-img-top {
+        height: 200px; /* Set height of card image */
+        object-fit: cover; /* Cover the entire area of the card */
+    }
+</style>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="static/images/beverages.jpg" class="card-img-top" alt="Beverages">
+                <div class="card-body">
+                    <h5 class="card-title">Beverages</h5>
+                    <p class="card-text">Explore our selection of refreshing beverages</p>
+                    <a href="/products/beverages" class="btn btn-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="static/images/dairy.jpg" class="card-img-top" alt="Dairy">
+                <div class="card-body">
+                    <h5 class="card-title">Dairy</h5>
+                    <p class="card-text">Explore our selection of refreshing Dairy.</p>
+                    <a href="/products/dairy" class="btn btn-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="static/images/pantry1.jpg" class="card-img-top" alt="Pantry Staples">
+                <div class="card-body">
+                    <h5 class="card-title">Pantry Staples</h5>
+                    <p class="card-text">Explore our selection of refreshing Pantry</p>
+                    <a href="/products/pantry" class="btn btn-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="static/images/meat.jpg" class="card-img-top" alt="Meat">
+                <div class="card-body">
+                    <h5 class="card-title">Meat</h5>
+                    <p class="card-text">Explore our selection of refreshing Meat.</p>
+                    <a href="/products/meat" class="btn btn-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="static/images/snacks.png" class="card-img-top" alt="Snacks">
+                <div class="card-body">
+                    <h5 class="card-title">Snacks</h5>
+                    <p class="card-text">Explore our selection of refreshing Snacks.</p>
+                    <a href="/products/snacks" class="btn btn-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="static/images/bakery.jpg" class="card-img-top" alt="Bakery">
+                <div class="card-body">
+                    <h5 class="card-title">Bakery</h5>
+                    <p class="card-text">Explore our selection of refreshing Bakery.</p>
+                    <a href="/products/bakery" class="btn btn-primary">View Products</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'footer.html' %}
+<!-- <script>
+ document.querySelectorAll('.view-products').forEach(link => {
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        const category = this.getAttribute('data-category');
+        fetch(`/products/${category}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(products => {
+                console.log('Products:', products);
+                const productsJSON = encodeURIComponent(JSON.stringify(products));
+                // Redirect to product.html with products data as a parameter
+                window.location.href = `products.html?products=${productsJSON}`;
+            })
+            .catch(error => console.error('Error:', error));
+    });
+});
+
+</script> -->
+
+
+</body>
+</html>

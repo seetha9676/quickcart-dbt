@@ -1,0 +1,47 @@
+{% include 'sidemenu.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancellation Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container" style="margin-top: 50px;">
+    <h1>Cancellation Details</h1>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Product Name</th>
+                <th>Size</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Reason</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cancellation in cancellations %}
+                {% for product in cancellation.products %}
+                    <tr>
+                        <td>{{ cancellation.username }}</td>
+                        <td>{{ product.productName }}</td>
+                        <td>{{ product.size }}</td>
+                        <td>{{ product.quantity }}</td>
+                        <td>{{ product.price }}</td>
+                        {% if loop.first %}
+                            <td rowspan="{{ cancellation.products|length }}">{{ cancellation.reason }}</td>
+                            <td rowspan="{{ cancellation.products|length }}">{{ cancellation.comment }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

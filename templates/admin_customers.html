@@ -1,0 +1,56 @@
+{% include 'sidemenu.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .user {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+      margin-bottom: 10px;
+    }
+    .user:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>User Details</h1>
+    <div id="users"></div>
+  </div>
+
+  <script>
+    fetch('/users')
+      .then(response => response.json())
+      .then(data => {
+        const usersDiv = document.getElementById('users');
+        data.users.forEach(user => {
+          const userDiv = document.createElement('div');
+          userDiv.classList.add('user');
+          userDiv.innerHTML = `
+            <h2>${user.firstname} ${user.lastname}</h2>
+            <p>Username: ${user.username}</p>
+            <p>Contact No: ${user.contactno}</p>
+            <p>Address: ${user.address}</p>
+          `;
+          usersDiv.appendChild(userDiv);
+        });
+      });
+  </script>
+</body>
+</html>

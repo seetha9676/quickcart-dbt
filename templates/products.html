@@ -1,0 +1,238 @@
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .slideshow-container {
+            max-width: 1000px;
+            position: relative;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .mySlides {
+            display: none;
+        }
+        .mySlides img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .text {
+            color: #f2f2f2;
+            font-size: 15px;
+            padding: 8px 12px;
+            position: absolute;
+            bottom: 8px;
+            width: 100%;
+            text-align: center;
+        }
+        #search {
+            margin-bottom: 10px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .container {
+            text-align: center;
+        }
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+            height: 300px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .card h3 {
+            margin-top: 0;
+        }
+        .quantity {
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="slideshow-container">
+    <div class="mySlides fade">
+        <img src="static/images/beverages.jpg">
+    </div>
+    <!-- Add more slides here -->
+   <div class="mySlides fade">
+    <img src="static/images/beverages.jpg">
+    </div>
+    <div class="mySlides fade">
+        <img src="static/images/beverages.jpg">
+    </div> 
+
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+</div>
+
+<div class="container">
+    <div id="search">
+        <input type="text" id="searchInput" placeholder="Search products by name..." onkeyup="searchProducts()">
+    </div>
+
+    <div id="products">
+        {% for product in products %}
+            <div class="card" data-productid="{{ product.productid }}" data-productname="{{ product.productname }}" data-productsize="{{ product.size }}" data-productprice="{{ product.price }}">
+                <h3>{{ product.productname }}</h3>
+                <p>Product ID: {{ product.productid }}</p>
+                <p>Price: ${{ product.price }}</p>
+                <p>Weight: {{ product.size }}</p>
+                <div class="quantity">
+                    <span>Quantity:</span>
+                    <button onclick="decreaseQuantity(this)" class="btn">-</button>
+                    <span data-quantity="1">1</span>
+                    <button onclick="increaseQuantity(this)" class="btn">+</button>
+                </div>
+                
+                <button onclick="addToCart(this)" class="btn">Add to Cart</button>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    var slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+        var i;
+        var slides = document.getElementsByClassName("mySlides");
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";  
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) {slideIndex = 1}    
+        slides[slideIndex-1].style.display = "block";  
+        setTimeout(showSlides, 2000); // Change image every 2 seconds
+    }
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+</script>
+
+<script>
+    function searchProducts() {
+        var input, filter, cards, card, title, i;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        cards = document.getElementById("products").getElementsByClassName("card");
+        for (i = 0; i < cards.length; i++) {
+            card = cards[i];
+            title = card.getElementsByTagName("h3")[0];
+            if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        }
+    }
+
+    function increaseQuantity(button) {
+        var quantitySpan = button.parentElement.querySelector('[data-quantity]');
+        if (quantitySpan) {
+            var quantity = parseInt(quantitySpan.getAttribute('data-quantity'));
+            quantitySpan.setAttribute('data-quantity', quantity + 1);
+            quantitySpan.textContent = quantity + 1;
+        }
+    }
+
+    function decreaseQuantity(button) {
+        var quantitySpan = button.parentElement.querySelector('[data-quantity]');
+        if (quantitySpan) {
+            var quantity = parseInt(quantitySpan.getAttribute('data-quantity'));
+            if (quantity > 1) {
+                quantitySpan.setAttribute('data-quantity', quantity - 1);
+                quantitySpan.textContent = quantity - 1;
+            }
+        }
+    }
+      
+    function addToCart(button) {
+        var card = button.closest('.card');
+        var productId = card.getAttribute('data-productid');
+        var productName = card.getAttribute('data-productname');
+        var productSize = card.getAttribute('data-productsize');
+        var productPrice = card.getAttribute('data-productprice');
+        var quantitySpan = card.querySelector('.quantity span[data-quantity]');
+        
+        if (quantitySpan) {
+            var quantity = parseInt(quantitySpan.getAttribute('data-quantity'));
+
+            var data = {
+                productId: productId,
+                productName: productName,
+                productSize: productSize,
+                productPrice: productPrice,
+                quantity: quantity
+            };
+
+            // Send AJAX request to add product to cart
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/add_to_cart", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
+        } else {
+            console.error("Quantity span not found.");
+        }
+    }
+</script>
+</body>
+</html>

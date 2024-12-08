@@ -1,0 +1,305 @@
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Add custom styles -->
+    <style>
+        /* Custom styles */
+        .cardproduct {
+            width: 100%; /* Make the card take full width */
+            border: 1px solid #ccc; /* Add border to the card */
+            border-radius: 5px; /* Add border radius for a rounded appearance */
+            margin-bottom: 15px; /* Add margin between cards */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            {% for item in cart_items %}
+            <div class="col-md-12 cardproduct" id="product_{{ item._id }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.productName }}</h5>
+                    <p class="card-text">Size: {{ item.productSize }}</p>
+                    <p class="card-text">Quantity: <input type="number" min="1" value="{{ item.quantity }}" onchange="updateQuantity('{{ item._id }}', this.value)"></p>
+                    <p class="card-texter">Price: {{ item.productPrice }}</p> <!-- Use subtotal as the product price -->
+                    <button class="btn btn-danger" onclick="deleteProduct('{{ item._id }}')">Remove</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h4>Item Total: $<span id="item_total">{{ item_total }}</span></h4>
+                <h4>Estimated Tax: ${{ est_tax }}</h4>
+                <h4>Subtotal: ${{ subtotal }}</h4>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h3>Delivery/Pickup Options</h3>
+                <label><input type="radio" id="delivery_option" name="delivery_pickup" value="delivery" checked> Delivery</label>
+                <label><input type="radio" id="pickup_option" name="delivery_pickup" value="pickup"> Pickup</label>
+            </div>
+        </div>
+        
+        <div class="row mt-3" id="delivery_address" style="display: block;">
+            <div class="col-md-12">
+                <h3>Delivery Address</h3>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" class="form-control" id="address" placeholder="Enter delivery address">
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="text" class="form-control" id="contactno" placeholder="Enter mobile number">
+                </div>
+                <div class="form-group">
+                    <label>Payment Options</label>
+                    <select class="form-control" id="payment_options">
+                        <option value="credit_card">Credit Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="debit_card">Debit Card</option>
+                    </select>
+                </div>
+                <div class="form-group"> 
+                    <input type="text" class="form-control" id="card_no" placeholder="Enter card number">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cvv">CVV</label>
+                        <input type="text" class="form-control" id="cvv" placeholder="Enter CVV">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="expiration_date">Expiration Date (MM/YY)</label>
+                        <input type="text" class="form-control" id="expiration_date" placeholder="MM/YY" >
+                    </div>
+            </div>
+            </div>
+        </div>
+        <div class="row mt-3" id="pickup_address" style="display: none;">
+            <div class="col-md-12">
+                <h3>Pickup Address</h3>
+                <p>Address: 67899 W 135th St, Overland Park</p>
+                <div class="form-group">
+                    <label for="pickup_datetime">Pickup Date and Time</label>
+                    <input type="datetime-local" class="form-control" id="pickup_datetime" name="pickup_datetime" required>
+                </div>
+                
+                
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="text" class="form-control" id="pickup_mobile" placeholder="Enter mobile number">
+                </div>
+                <div class="form-group">
+                    <label>Payment Options</label>
+                    <select class="form-control" id="payment_options">
+                        <option value="credit_card">Credit Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="debit_card">Debit Card</option>
+                    </select>
+                </div>
+                <div class="form-group"> 
+                    <input type="text" class="form-control" id="card_no" placeholder="Enter card number">
+                </div>
+                    <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cvv">CVV</label>
+                        <input type="text" class="form-control" id="cvv" placeholder="Enter CVV">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="expiration_date">Expiration Date (MM/YY)</label>
+                        <input type="text" class="form-control" id="expiration_date" placeholder="MM/YY" >
+                    </div>
+            </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary" id="place_order_btn">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get today's date
+        var today = new Date();
+
+        // Format the date in the required format (YYYY-MM-DD)
+        var formattedDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+
+        // Set the minimum date for the datetime-local input
+        document.getElementById('pickup_datetime').min = formattedDate + 'T10:00'; // Set the minimum time as 10:00 AM
+
+        // Function to toggle delivery and pickup address fields
+        function toggleAddressFields() {
+            var deliveryOption = document.getElementById('delivery_option');
+            var pickupOption = document.getElementById('pickup_option');
+            var deliveryAddress = document.getElementById('delivery_address');
+            var pickupAddress = document.getElementById('pickup_address');
+
+            if (deliveryOption.checked) {
+                deliveryAddress.style.display = 'block';
+                pickupAddress.style.display = 'none';
+            } else if (pickupOption.checked) {
+                deliveryAddress.style.display = 'none';
+                pickupAddress.style.display = 'block';
+            }
+        }
+
+        // Toggle address fields when the page loads
+        toggleAddressFields();
+
+        // Toggle address fields when delivery/pickup option changes
+        document.querySelectorAll('input[name="delivery_pickup"]').forEach(function(option) {
+            option.addEventListener('change', toggleAddressFields);
+        });
+
+        // Function to delete a product from the cart
+        function deleteProduct(id) {
+            // Make an AJAX request to delete the product from the cart collection
+            fetch('/delete_productcart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id: id})
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Remove the product from the UI
+                    document.getElementById('product_' + id).remove();
+                    window.location.reload();
+                } else {
+                    //alert('Failed to delete product from the cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                //alert('Failed to delete product from the cart');
+            });
+        }
+
+        // Function to update the quantity of a product
+        function updateQuantity(id, quantity) {
+            // Make an AJAX request to update the quantity of the product in the cart collection
+            fetch('/update_quantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id: id, quantity: quantity})
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                    // Update the total price in the UI
+                    var priceElement = document.getElementById('price_' + id);
+                    var price = parseFloat(priceElement.innerText);
+                    var totalPrice = price * quantity;
+                    priceElement.innerText = totalPrice.toFixed(2);
+                } else {
+                    //alert('updated quantity of the product in the cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                //alert('updated quantity of the product in the cart');
+            });
+        }
+
+        // Place order button click handler
+    // Place order button click handler
+document.getElementById('place_order_btn').addEventListener('click', function() {
+    // Gather order details
+    var orderDetails = {
+        products: [],
+        deliveryOption: document.querySelector('input[name="delivery_pickup"]:checked').value,
+        paymentOption: document.getElementById('payment_options').value
+    };
+
+    // Add delivery address and mobile number if delivery option is selected
+    if (orderDetails.deliveryOption === 'delivery') {
+        orderDetails.deliveryAddress = document.getElementById('address').value;
+        orderDetails.deliveryMobile = document.getElementById('contactno').value;
+      //  orderDetails.expectedDelivery = '{{ expected_delivery }}';
+    } else { // Add pickup date and mobile number if pickup option is selected
+        orderDetails.pickupDateTime = document.getElementById('pickup_datetime').value;
+        orderDetails.pickupMobile = document.getElementById('pickup_mobile').value;
+    }
+
+    // Add product details
+    var products = document.querySelectorAll('.cardproduct');
+    products.forEach(function(product) {
+        var productName = product.querySelector('.card-title').innerText;
+        var productSize = product.querySelector('.card-text:nth-of-type(2)').innerText.replace('Size: ', '');
+        var quantity = parseInt(product.querySelector('input[type="number"]').value);
+        var price = product.querySelector('.card-texter').innerText;
+     
+
+        var productPrice = parseFloat('{{ subtotal }}'); // Use subtotal as the product price
+        orderDetails.productPrice =productPrice
+        console.log(productName, productSize, quantity, price,productPrice);
+         // Add expected delivery field by adding today's date + 4 days if delivery option is selected
+    if (orderDetails.deliveryOption === 'delivery') {
+        var expectedDeliveryDate = new Date();
+        expectedDeliveryDate.setDate(expectedDeliveryDate.getDate() + 4); // Add 4 days
+        orderDetails.expectedDelivery = expectedDeliveryDate.toISOString().split('T')[0];
+    }
+        orderDetails.products.push({
+            productName: productName,
+            size: productSize,
+            quantity: quantity,
+            price: price,
+            
+        });
+    });
+
+    // Make a POST request to send order details to Flask backend
+    fetch('/place_order', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderDetails)
+    })
+    .then(response => {
+        if (response.ok) {
+            //alert('Order placed successfully!');
+            clearCart();
+             window.location.href = '/home';
+        } else {
+            throw new Error('Failed to place order');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        //alert('Failed to place order');
+    });
+});
+  // Function to clear the cart
+  function clearCart() {
+            fetch('/clear_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    //alert('Redirecting to home page!');
+                    // Redirect to a different page or do something else after clearing the cart
+                } else {
+                    throw new Error('Failed to fetch data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                //alert('Failed to clear cart data');
+            });
+        }
+    </script>
+</body>
+</html>

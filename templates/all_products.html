@@ -1,0 +1,347 @@
+{% include 'sidemenu.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Products</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Add your custom CSS here -->
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>All Products</h2>
+        <button class="btn btn-success" onclick="showAddProductForm()">Add Product</button>
+        <div id="addProductFormContainer" style="display: none;">
+            <h3>Add Product</h3>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="productname">Product Name:</label>
+                    <input type="text" class="form-control" id="productname" name="productname">
+                </div>
+                <div class="form-group">
+                    <label for="productid">Product ID:</label>
+                    <input type="text" class="form-control" id="productid" name="productid" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="size">Weight:</label>
+                    <input type="text" class="form-control" id="size" name="size">
+                </div>
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="text" class="form-control" id="price" name="price">
+                </div>
+             
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select class="form-control" id="category" name="category" onchange="changeTypeOptions()">
+                        <option value="">Select Category</option>
+                        <option value="beverages">Beverages</option>
+                        <option value="meat">Meat</option>
+                        <option value="dairy">Dairy</option>
+                        <option value="pantry">Pantry</option>
+                        <option value="snacks">Snacks</option>
+                        <option value="bakery">Bakery</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="type">Type:</label>
+                    <select class="form-control" id="type" name="type">
+                        <option value="">Select Type</option>
+                        <option value="water">Water</option>
+                        <option value="coffee">Coffee</option>
+                        <option value="energy drinks">Energy Drinks</option>
+                        <option value="Protein Drinks">Protein Drinks</option>
+                        <option value="juice">Juice</option>
+                        <option value="Soft Drinks">Soft Drinks</option>
+                    </select>
+                </div>
+                <!-- Include other input fields for product details -->
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Product ID</th>
+                    <th>Weight</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.productname }}</td>
+                    <td>{{ product.productid }}</td>
+                    <td>{{ product.size }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.type }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="showEditProductForm('{{ product._id }}')">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteProduct('{{ product.productid }}')">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="editProductFormContainer" style="display: none;">
+            <h3>Edit Product</h3>
+            <form id="editProductForm">
+                <div class="form-group">
+                    <label for="edit_productname">Product Name:</label>
+                    <input type="text" class="form-control" id="edit_productname" name="productname">
+                </div>
+                <div class="form-group">
+                    <label for="edit_productid">Product ID:</label>
+                    <input type="text" class="form-control" id="edit_productid" name="product_id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="edit_size">Size:</label>
+                    <input type="text" class="form-control" id="edit_size" name="size">
+                </div>
+                <div class="form-group">
+                    <label for="edit_price">Price:</label>
+                    <input type="text" class="form-control" id="edit_price" name="price">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_category">Category:</label>
+                    <select class="form-control" id="edit_category" name="category" onchange="changeEditTypeOptions()">
+                        <option value="">Select Category</option>
+                        <option value="beverages">Beverages</option>
+                        <option value="meat">Meat</option>
+                        <option value="dairy">Dairy</option>
+                        <option value="pantry">Pantry</option>
+                        <option value="snacks">Snacks</option>
+                        <option value="bakery">Bakery</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    
+                    <label for="edit_type">Type:</label>
+                    <select class="form-control" id="edit_type" name="type">
+                        <option value="">Select</option>
+                        <option value="water">Water</option>
+                        <option value="coffee">Coffee</option>
+                        <option value="energy drinks">Energy Drinks</option>
+                        <option value="Protein Drinks">Protein Drinks</option>
+                        <option value="juice">Juice</option>
+                        <option value="Soft Drinks">Soft Drinks</option>
+                    </select>
+                </div>
+                <!-- Include other input fields for product details -->
+                <button type="submit" class="btn btn-primary" id="editProductFormSubmit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Add your custom JavaScript here -->
+    <script>
+        function showAddProductForm() {
+            console.log("showAddProductForm function called");
+            var formContainer = $('#addProductFormContainer');
+            if (formContainer.is(':visible')) {
+                console.log("Form container is visible, hiding...");
+                formContainer.hide();
+            } else {
+                console.log("Form container is hidden, showing...");
+                formContainer.show();
+                generateProductID();
+            }
+        }
+
+        function generateProductID() {
+            var productID = Math.floor(100000 + Math.random() * 900000);
+            $('#productid').val(productID);
+        }
+
+        function changeTypeOptions() {
+            var category = $('#category').val();
+            var typeDropdown = $('#type');
+            typeDropdown.empty(); // Clear existing options
+            if (category === 'beverages') {
+                typeDropdown.append('<option value="water">Water</option>');
+                typeDropdown.append('<option value="coffee">Coffee</option>');
+                typeDropdown.append('<option value="energy drinks">Energy Drinks</option>');
+                typeDropdown.append('<option value="Protein Drinks">Protein Drinks</option>');
+                typeDropdown.append('<option value="juice">Juice</option>');
+                typeDropdown.append('<option value="Soft Drinks">Soft Drinks</option>');
+            } else if (category === 'meat') {
+                typeDropdown.append('<option value="Ground Beef">Ground Beef</option>');
+                typeDropdown.append('<option value="chicken">Chicken</option>');
+                typeDropdown.append('<option value="turkey">Turkey</option>');
+                typeDropdown.append('<option value="fish">Fish</option>');
+                typeDropdown.append('<option value="Pork">Pork</option>');
+            } else if (category === 'dairy') {
+                typeDropdown.append('<option value="cheese">Cheese</option>');
+                typeDropdown.append('<option value="milk">Milk</option>');
+                typeDropdown.append('<option value="salted butter">Salted Butter</option>');
+                typeDropdown.append('<option value="grilled cheese">Grilled Cheese</option>');
+                typeDropdown.append('<option value="Yogurt">Yogurt</option>');
+            } else if (category === 'pantry') {
+                typeDropdown.append('<option value="canned goods">Canned Goods</option>');
+                typeDropdown.append('<option value="Breakfast">Breakfast</option>');
+                typeDropdown.append('<option value="Spreads">Spreads</option>');
+                typeDropdown.append('<option value="sauces">Sauces</option>');
+            } else if (category === 'snacks') {
+                typeDropdown.append('<option value="chips">Chips</option>');
+                typeDropdown.append('<option value="snack bars">Snack Bars</option>');
+                typeDropdown.append('<option value="chocolate">Chocolate</option>');
+                typeDropdown.append('<option value="cookies">Cookies</option>');
+                typeDropdown.append('<option value="popcorn">Popcorn</option>');
+            } else if (category === 'bakery') {
+                typeDropdown.append('<option value="Brownies">Brownies</option>');
+                typeDropdown.append('<option value="Cakes">Cakes</option>');
+                typeDropdown.append('<option value="Bread">Bread</option>');
+                typeDropdown.append('<option value="Buns">Buns</option>');
+                typeDropdown.append('<option value="bagels">Bagels</option>');
+            }
+        }
+
+        $(document).ready(function() {
+            $('#addProductForm').submit(function(event) {
+                event.preventDefault(); // Prevent form submission
+                addProduct();
+            });
+        });
+
+        function addProduct() {
+            // Get form data
+            var formData = $('#addProductForm').serialize();
+            console.log('Serialized Form Data:', formData);
+            // Make AJAX POST request to add_product endpoint
+            $.ajax({
+                type: 'POST',
+                url: '/add_product',
+                data: formData,
+                success: function(response) {
+                    console.log('Product added successfully:', response);
+                    window.location.reload();
+                    // You can display a success message or perform other actions here
+                },
+                error: function(error) {
+                    console.error('Error adding product:', error);
+                }
+            });
+        }
+
+        function showEditProductForm(_id) {
+            // Make an AJAX request to fetch the product details
+            $.ajax({
+                type: 'GET',
+                url: '/get_product/' + _id, // Endpoint to fetch product details
+                success: function(response) {
+                    console.log(response);
+                    // Populate the form fields with the retrieved product data
+                    $('#edit_productname').val(response.productname);
+                    $('#edit_productid').val(response.productid);
+                    $('#edit_size').val(response.size);
+                    $('#edit_price').val(response.price);
+                    $('#edit_type').val(response.type);
+                    $('#edit_category').val(response.category);
+
+                    // Show the edit form container
+                    $('#editProductFormContainer').show();
+                },
+                error: function(error) {
+                    console.error('Error fetching product details:', error);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            $('#editProductForm').submit(function(event) {
+                event.preventDefault(); // Prevent default form submission behavior
+                var product_id = $('#edit_productid').val(); // Get product ID from the form field
+                editProduct(product_id); // Call editProduct function with the product ID
+            });
+        });
+
+        function editProduct(_id) {
+            // Get form data for edited product
+            var editedData = $('#editProductForm').serialize(); // Get edited data from form fields
+            console.log('Edited Data:', editedData); // Log edited data for debugging
+
+            $.ajax({
+                type: 'POST',
+                url: '/edit_product/' + _id,
+                data: editedData,
+                contentType: 'application/x-www-form-urlencoded', // Set content type explicitly
+                success: function(response) {
+                    console.log('Product edited successfully:', response);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    console.error('Error editing product:', error);
+                }
+            });
+        }
+
+        function changeEditTypeOptions() {
+            var category = $('#edit_category').val();
+            var typeDropdown = $('#edit_type');
+            typeDropdown.empty(); // Clear existing options
+            if (category === 'beverages') {
+                typeDropdown.append('<option value="water">Water</option>');
+                typeDropdown.append('<option value="coffee">Coffee</option>');
+                typeDropdown.append('<option value="energy drinks">Energy Drinks</option>');
+                typeDropdown.append('<option value="Protein Drinks">Protein Drinks</option>');
+                typeDropdown.append('<option value="juice">Juice</option>');
+                typeDropdown.append('<option value="Soft Drinks">Soft Drinks</option>');
+            } else if (category === 'meat') {
+                typeDropdown.append('<option value="Ground Beef">Ground Beef</option>');
+                typeDropdown.append('<option value="chicken">Chicken</option>');
+                typeDropdown.append('<option value="turkey">Turkey</option>');
+                typeDropdown.append('<option value="fish">Fish</option>');
+                typeDropdown.append('<option value="Pork">Pork</option>');
+            } else if (category === 'dairy') {
+                typeDropdown.append('<option value="cheese">Cheese</option>');
+                typeDropdown.append('<option value="milk">Milk</option>');
+                typeDropdown.append('<option value="salted butter">Salted Butter</option>');
+                typeDropdown.append('<option value="grilled cheese">Grilled Cheese</option>');
+                typeDropdown.append('<option value="Yogurt">Yogurt</option>');
+            } else if (category === 'pantry') {
+                typeDropdown.append('<option value="canned goods">Canned Goods</option>');
+                typeDropdown.append('<option value="Breakfast">Breakfast</option>');
+                typeDropdown.append('<option value="Spreads">Spreads</option>');
+                typeDropdown.append('<option value="sauces">Sauces</option>');
+            } else if (category === 'snacks') {
+                typeDropdown.append('<option value="chips">Chips</option>');
+                typeDropdown.append('<option value="snack bars">Snack Bars</option>');
+                typeDropdown.append('<option value="chocolate">Chocolate</option>');
+                typeDropdown.append('<option value="cookies">Cookies</option>');
+                typeDropdown.append('<option value="popcorn">Popcorn</option>');
+            } else if (category === 'bakery') {
+                typeDropdown.append('<option value="Brownies">Brownies</option>');
+                typeDropdown.append('<option value="Cakes">Cakes</option>');
+                typeDropdown.append('<option value="Bread">Bread</option>');
+                typeDropdown.append('<option value="Buns">Buns</option>');
+                typeDropdown.append('<option value="bagels">Bagels</option>');
+            }
+        }
+
+        function deleteProduct(product_id) {
+            $.ajax({
+                type: 'GET',
+                url: '/delete_product/' + product_id,
+                success: function(response) {
+                    console.log('Product deleted successfully:', response);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    console.error('Error deleting product:', error);
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

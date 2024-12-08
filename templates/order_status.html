@@ -1,0 +1,222 @@
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        .status {
+            font-size: 24px;
+            color: green;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status i {
+            margin-right: 10px;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            margin-top: 34px;
+            width: 89%;
+        }
+
+        .status-bar .line {
+            flex: 1;
+            height: 2px;
+            background-color: #ccc;
+        }
+
+        .status-bar .icon {
+            font-size: 24px;
+            margin: 0 10px;
+        }
+        
+        .cancel-dropdown {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .cancel-dropdown.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" style="margin-top: 23px;">
+    <div class="status-bar">
+        <div class="status"><i class="fas fa-check-circle icon"></i> Order Placed</div>
+        <div class="line"></div>
+        <div class="inprogress"><i class="fas fa-shipping-fast icon"></i> Order Shipped</div>
+        <div class="line"></div>
+        <div class="inprogress"><i class="fas fa-truck icon"></i> Out for Delivery</div>
+        <div class="line"></div>
+        <div class="inprogress"><i class="fas fa-box-open icon"></i> Delivered</div>
+        <div class="line"></div>
+        <div class="inprogress"><i class="fas fa-times-circle icon"></i> Cancelled</div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Ordered Products</h2>
+            {% for product in products %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.productName }}</h5>
+                    <p class="card-text">{{ product.size }} {{ product.quantity }}</p>
+                    <p class="card-text">{{ product.price }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            <button class="btn btn-danger" onclick="showCancelDropdown()">Cancel Order</button>
+            <div class="cancel-dropdown" id="cancelDropdown">
+                <select class="form-control" id="cancelReason">
+                    <option value="delay">Delay in Delivery</option>
+                    <option value="changed_mind">Changed My Mind</option>
+                    <option value="wrong_order">Wrong Order</option>
+                    <option value="other">Other</option>
+                </select>
+                <textarea class="form-control mt-2" id="cancelComment" placeholder="Comment"></textarea>
+                <button class="btn btn-primary mt-2" onclick="cancelOrder()">Proceed to Cancellation</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2>Order Details</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Delivery Option</h5>
+                    <p class="card-text">{{ deliveryOption }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Payment Option</h5>
+                    <p class="card-text">{{ paymentOption }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ deliveryOption }}Address</h5>
+                    <p class="card-text">{{ deliveryAddress }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mobile Number</h5>
+                    <p class="card-text">{{ deliveryMobile }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Expected Delivery</h5>
+                    <p class="card-text">{{ expectedDelivery }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <p class="card-text">Total Price:{{ productPrice }}</p>
+                </div>
+            </div>
+         
+        </div>
+    </div>
+</div>
+
+<script>
+    function showCancelDropdown() {
+        document.getElementById("cancelDropdown").classList.toggle("active");
+    }
+
+    function cancelOrder() {
+        var reason = document.getElementById("cancelReason").value;
+        var comment = document.getElementById("cancelComment").value;
+
+        var products = document.querySelectorAll(".card.mb-3");
+        var productDetails = [];
+        products.forEach(function(product) {
+            var productName = product.querySelector(".card-title").textContent;
+            var size = "";
+            var quantity = "";
+            var price = "";
+            var cardText = product.querySelectorAll(".card-text");
+            cardText.forEach(function(text) {
+                var textContent = text.textContent;
+                if (textContent.includes("Quantity:")) {
+                    quantity = textContent.replace("Quantity:", "").trim();
+                } else if (textContent.includes("Price:")) {
+                    price = textContent.replace("Price:", "").trim();
+                } else {
+                    size = textContent.trim();
+                }
+            });
+            productDetails.push({
+                "productName": productName,
+                "size": size,
+                "quantity": quantity,
+                "price": price
+            });
+        });
+
+        var data = {
+            "username": "{{ username }}",
+            "products": productDetails,
+            "reason": reason,
+            "comment": comment
+        };
+
+        fetch('/cancel_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            
+            if (data.success) {
+              //  alert(hello);
+              
+            } else {
+               // alert(data.message);
+                deleteDelivery();
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    function deleteDelivery() {
+        var username = "{{ username }}";
+        fetch('/delete_delivery', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({"username": username})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            window.location.reload();
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            window.location.reload();
+        });
+    }
+</script>
+
+
+</body>
+</html>

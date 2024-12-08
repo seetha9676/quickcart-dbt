@@ -1,0 +1,60 @@
+
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancelled Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="margin-top: 34px;">Cancelled Orders</h1>
+    <table>
+        <tr>
+           
+            <th>Product Name</th>
+          
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Reason</th>
+            <th>Comment</th>
+        </tr>
+        {% for order in cancelled_orders %}
+        <tr>
+          
+            <td>{{ order.products.0.productName }}</td>
+           
+            <td>{{ order.products.0.quantity }}</td>
+            <td>{{ order.products.0.price }}</td>
+            <td>{{ order.reason }}</td>
+            <td>{{ order.comment }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

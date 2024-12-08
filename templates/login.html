@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            /* Set background image */
+            background-image: url("static/images/main.jpeg");
+            /* Full height */
+            height: 100vh;
+            /* Center and scale the background image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            /* Add flexbox to center the content vertically */
+            display: flex;
+            align-items: center;
+        }
+        .container {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.8); /* Add a semi-transparent white background to the login card */
+        }
+        .signup-link {
+            display: flex;
+            align-items: center;
+        }
+        .signup-link h6 {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Login</h3>
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                            <div class="signup-link">
+                                <h6>Don't have an account?</h6>
+                                <a href="/signup" class="btn btn-link">Signup</a> <!-- Signup link -->
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+    $(document).ready(function() {
+    $('#loginForm').submit(function(event) {
+        event.preventDefault();
+
+        var username = $('#username').val();
+        var password = $('#password').val();
+
+        var data = {
+            username: username,
+            password: password
+        };
+
+        // Check if the username is admin@gmail.com
+        if (username === "admin@gmail.com") {
+            window.location.href = '/all_products';
+            return; // Return to prevent further execution of the function
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/login',
+            data: data,
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = '/home';
+                } else {
+                    //alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+});
+
+    </script>
+</body>
+</html>
