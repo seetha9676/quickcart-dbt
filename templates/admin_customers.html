@@ -8,48 +8,64 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
     }
-    .container {
-      width: 80%;
-      margin: 20px auto;
-      border: 1px solid #ccc;
-      padding: 20px;
-      box-sizing: border-box;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
     }
-    .user {
-      border-bottom: 1px solid #ccc;
-      padding: 10px 0;
-      margin-bottom: 10px;
+    th, td {
+      border: 1px solid #ddd;
+      text-align: left;
+      padding: 8px;
     }
-    .user:last-child {
-      border-bottom: none;
+    th {
+      background-color: #f2f2f2;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>User Details</h1>
-    <div id="users"></div>
-  </div>
+  <h1>Customer Details</h1>
+  <table id="customersTable">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Username</th>
+        <th>Contact No</th>
+        <th>Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be dynamically added here -->
+    </tbody>
+  </table>
 
   <script>
-    fetch('/users')
-      .then(response => response.json())
+    // Fetch customers data and populate the table
+    fetch('/users_detail')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
-        const usersDiv = document.getElementById('users');
+        const tbody = document.querySelector('#customersTable tbody');
         data.users.forEach(user => {
-          const userDiv = document.createElement('div');
-          userDiv.classList.add('user');
-          userDiv.innerHTML = `
-            <h2>${user.firstname} ${user.lastname}</h2>
-            <p>Username: ${user.username}</p>
-            <p>Contact No: ${user.contactno}</p>
-            <p>Address: ${user.address}</p>
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${user.firstname}</td>
+            <td>${user.lastname}</td>
+            <td>${user.username}</td>
+            <td>${user.contactno}</td>
+            <td>${user.address}</td>
           `;
-          usersDiv.appendChild(userDiv);
+          tbody.appendChild(row);
         });
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
       });
   </script>
 </body>

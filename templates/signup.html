@@ -84,12 +84,12 @@
                     data: $(this).serialize(), // Serialize the form data
                     success: function(response){
                         if(response.success) {
-                            //alert(response.message);
+                            alert(response.message);
                             // User created successfully, redirect to login page
                             window.location.href = '/';
                         } else {
                             // Username already exists, display an //alert message
-                            //alert(response.message);
+                            alert(response.message);
                             window.location.href = '/';
                         }
                     }

@@ -204,35 +204,48 @@
             }
         }
     }
-      
     function addToCart(button) {
-        var card = button.closest('.card');
-        var productId = card.getAttribute('data-productid');
-        var productName = card.getAttribute('data-productname');
-        var productSize = card.getAttribute('data-productsize');
-        var productPrice = card.getAttribute('data-productprice');
-        var quantitySpan = card.querySelector('.quantity span[data-quantity]');
-        
-        if (quantitySpan) {
-            var quantity = parseInt(quantitySpan.getAttribute('data-quantity'));
+    var card = button.closest('.card');
+    var productId = card.getAttribute('data-productid');
+    var productName = card.getAttribute('data-productname');
+    var productSize = card.getAttribute('data-productsize');
+    var productPrice = card.getAttribute('data-productprice');
+    var quantitySpan = card.querySelector('.quantity span[data-quantity]');
 
-            var data = {
-                productId: productId,
-                productName: productName,
-                productSize: productSize,
-                productPrice: productPrice,
-                quantity: quantity
-            };
+    if (quantitySpan) {
+        var quantity = parseInt(quantitySpan.getAttribute('data-quantity'));
 
-            // Send AJAX request to add product to cart
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/add_to_cart", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(data));
-        } else {
-            console.error("Quantity span not found.");
-        }
+        var data = {
+            productId: productId,
+            productName: productName,
+            productSize: productSize,
+            productPrice: productPrice,
+            quantity: quantity
+        };
+
+        console.log("Sending Data:", data);  // Debugging: Print data being sent
+
+        fetch('/add_to_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('Product added to cart successfully!');
+            } else {
+                alert('Failed to add product to cart: ' + result.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        console.error("Quantity span not found.");
     }
+}
+
 </script>
 </body>
 </html>

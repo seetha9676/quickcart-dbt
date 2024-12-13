@@ -3,19 +3,18 @@
 <head>
     <!-- Include Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Add custom styles -->
     <style>
-        /* Custom styles */
         .cardproduct {
-            width: 100%; /* Make the card take full width */
-            border: 1px solid #ccc; /* Add border to the card */
-            border-radius: 5px; /* Add border radius for a rounded appearance */
-            margin-bottom: 15px; /* Add margin between cards */
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
+        <!-- Cart Items Section -->
         <div class="row">
             {% for item in cart_items %}
             <div class="col-md-12 cardproduct" id="product_{{ item._id }}">
@@ -23,11 +22,13 @@
                     <h5 class="card-title">{{ item.productName }}</h5>
                     <p class="card-text">Size: {{ item.productSize }}</p>
                     <p class="card-text">Quantity: {{ item.quantity }}</p>
-                    <p class="card-text">Price: {{ item.productPrice }}</p>
+                    <p class="card-text">Price: $<span>{{ item.productPrice }}</span></p>
                 </div>
             </div>
             {% endfor %}
         </div>
+        
+        <!-- Total Section -->
         <div class="row mt-5">
             <div class="col-md-12">
                 <h4>Item Total: ${{ item_total }}</h4>
@@ -35,6 +36,8 @@
                 <h4>Subtotal: ${{ subtotal }}</h4>
             </div>
         </div>
+
+        <!-- Delivery and Pickup Options -->
         <div class="row mt-5">
             <div class="col-md-12">
                 <h3>Delivery/Pickup Options</h3>
@@ -42,7 +45,8 @@
                 <label><input type="radio" id="pickup_option" name="delivery_pickup" value="pickup"> Pickup</label>
             </div>
         </div>
-        
+
+        <!-- Delivery Address Section -->
         <div class="row mt-3" id="delivery_address" style="display: block;">
             <div class="col-md-12">
                 <h3>Delivery Address</h3>
@@ -62,11 +66,10 @@
                         <option value="debit_card">Debit Card</option>
                     </select>
                 </div>
-                <div class="form-group"> 
-                    <input type="text" class="form-control" id="card_no" placeholder="Enter card number">
-                </div>
             </div>
         </div>
+
+        <!-- Pickup Address Section -->
         <div class="row mt-3" id="pickup_address" style="display: none;">
             <div class="col-md-12">
                 <h3>Pickup Address</h3>
@@ -75,154 +78,101 @@
                     <label for="pickup_datetime">Pickup Date and Time</label>
                     <input type="datetime-local" class="form-control" id="pickup_datetime" name="pickup_datetime" required>
                 </div>
-                
-                
                 <div class="form-group">
                     <label>Mobile Number</label>
                     <input type="text" class="form-control" id="pickup_mobile" placeholder="Enter mobile number">
                 </div>
                 <div class="form-group">
                     <label>Payment Options</label>
-                    <select class="form-control" id="payment_options">
+                    <select class="form-control" id="pickup_payment_options">
                         <option value="credit_card">Credit Card</option>
                         <option value="paypal">PayPal</option>
                         <option value="debit_card">Debit Card</option>
                     </select>
                 </div>
-                <div class="form-group"> 
-                    <input type="text" class="form-control" id="card_no" placeholder="Enter card number">
-                </div>
             </div>
         </div>
+
+        <!-- Place Order Button -->
         <div class="row mt-3">
             <div class="col-md-12">
-                <button type="button" class="btn btn-primary" id="place_order_btn">Place Order</button>
+                <button type="button" class="btn btn-primary" id="place_order_btn">Place test Order</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Get today's date
-        var today = new Date();
-
-        // Format the date in the required format (YYYY-MM-DD)
-        var formattedDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
-
-        // Set the minimum date for the datetime-local input
-        document.getElementById('pickup_datetime').min = formattedDate + 'T10:00'; // Set the minimum time as 10:00 AM
-
-        // Function to toggle delivery and pickup address fields
+        // Toggle between delivery and pickup options
         function toggleAddressFields() {
-            var deliveryOption = document.getElementById('delivery_option');
-            var pickupOption = document.getElementById('pickup_option');
-            var deliveryAddress = document.getElementById('delivery_address');
-            var pickupAddress = document.getElementById('pickup_address');
+            const deliveryOption = document.getElementById('delivery_option').checked;
+            const deliveryAddress = document.getElementById('delivery_address');
+            const pickupAddress = document.getElementById('pickup_address');
 
-            if (deliveryOption.checked) {
-                deliveryAddress.style.display = 'block';
-                pickupAddress.style.display = 'none';
-            } else if (pickupOption.checked) {
-                deliveryAddress.style.display = 'none';
-                pickupAddress.style.display = 'block';
-            }
+            deliveryAddress.style.display = deliveryOption ? 'block' : 'none';
+            pickupAddress.style.display = deliveryOption ? 'none' : 'block';
         }
 
-        // Toggle address fields when the page loads
-        toggleAddressFields();
-
-        // Toggle address fields when delivery/pickup option changes
-        document.querySelectorAll('input[name="delivery_pickup"]').forEach(function(option) {
+        document.querySelectorAll('input[name="delivery_pickup"]').forEach(option => {
             option.addEventListener('change', toggleAddressFields);
         });
 
-        // Function to delete a product from the cart
-        function deleteProduct(id) {
-            // Make an AJAX request to delete the product from the cart collection
-            fetch('/delete_productcart', {
+        // Set the minimum date for pickup
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        document.getElementById('pickup_datetime').min = formattedDate + 'T10:00';
+
+        document.getElementById('place_order_btn').addEventListener('click', function () {
+            const deliveryOption = document.querySelector('input[name="delivery_pickup"]:checked').value;
+            const paymentOption = document.getElementById('payment_options').value;
+            const deliveryAddress = deliveryOption === 'delivery' ? document.getElementById('delivery_address_input').value : null;
+            const deliveryMobile = deliveryOption === 'delivery' ? document.getElementById('delivery_mobile').value : null;
+
+            const expectedDelivery = deliveryOption === 'delivery' ? new Date().toISOString().split('T')[0] : null;
+
+            const products = Array.from(document.querySelectorAll('.cardproduct')).map(item => {
+                return {
+                    productName: item.querySelector('.card-title').innerText.trim(),
+                    size: item.querySelector('.card-text:nth-child(2)').innerText.split(': ')[1].trim(),
+                    quantity: parseInt(item.querySelector('.card-text:nth-child(3)').innerText.split(': ')[1]),
+                    price: parseFloat(item.querySelector('.card-text:nth-child(4) span').innerText.trim())
+                };
+            });
+
+            const payload = {
+                deliveryOption,
+                paymentOption,
+                deliveryAddress,
+                deliveryMobile,
+                expectedDelivery,
+                products
+            };
+
+            console.log('Payload:', payload);
+
+            fetch('/place_order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({id: id})
+                body: JSON.stringify(payload)
             })
-            .then(response => {
-                if (response.ok) {
-                    // Remove the product from the UI
-                    document.getElementById('product_' + id).remove();
-                    updateCart(); // Update cart after deleting a product
-                } else {
-                    //alert('Failed to delete product from the cart');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                //alert('Failed to delete product from the cart');
-            });
-        }
-
-        // Function to update the quantity of a product
-        function updateQuantity(id, quantity) {
-            // Make an AJAX request to update the quantity of the product in the cart collection
-            fetch('/update_quantity', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({id: id, quantity: quantity})
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Update the total price in the UI
-                    var priceElement = document.getElementById('price_' + id);
-                    var price = parseFloat(priceElement.innerText);
-                    var totalPrice = price * quantity;
-                    priceElement.innerText = totalPrice.toFixed(2);
-                    updateCart(); // Update cart after updating quantity
-                } else {
-                    //alert('Failed to update quantity of the product in the cart');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                //alert('Failed to update quantity of the product in the cart');
-            });
-        }
-
-        // Function to update the total price
-        function updateTotal() {
-            var total = 0;
-            var prices = document.querySelectorAll('[id^="price_"]');
-            prices.forEach(function(price) {
-                total += parseFloat(price.innerText);
-            });
-            document.getElementById('item_total').innerText = total.toFixed(2);
-        }
-
-        // Function to update cart content
-        function updateCart() {
-            fetch('/cart')
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Failed to fetch cart data');
-                }
-            })
-            .then(data => {
-                // Update UI with new cart data
-                document.querySelector('.row').innerHTML = data.cartHTML;
-                updateTotal();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
-        // Place order button click handler
-        document.getElementById('place_order_btn').addEventListener('click', function() {
-            // Perform form validation here
-            //alert('Order placed successfully!');
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order placed successfully!');
+                    } else {
+                        console.error('Failed to place order:', data.message);
+                        alert('Failed to place order: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error placing order:', error);
+                    alert('An error occurred while placing the order.');
+                });
         });
+
+        // Initial toggle for address fields
+        toggleAddressFields();
     </script>
 </body>
 </html>

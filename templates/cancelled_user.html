@@ -1,5 +1,3 @@
-
-{% include 'header.html' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,28 +31,42 @@
     </style>
 </head>
 <body>
-    <h1 style="margin-top: 34px;">Cancelled Orders</h1>
+    <h1>Cancelled Orders</h1>
     <table>
-        <tr>
-           
-            <th>Product Name</th>
-          
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Reason</th>
-            <th>Comment</th>
-        </tr>
-        {% for order in cancelled_orders %}
-        <tr>
-          
-            <td>{{ order.products.0.productName }}</td>
-           
-            <td>{{ order.products.0.quantity }}</td>
-            <td>{{ order.products.0.price }}</td>
-            <td>{{ order.reason }}</td>
-            <td>{{ order.comment }}</td>
-        </tr>
-        {% endfor %}
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Size</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Reason</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in cancelled_orders %}
+                <!-- Product 0 -->
+                {% if order.product0_name %}
+                <tr>
+                    <td>{{ order.product0_name }}</td>
+                    <td>{{ order.product0_size }}</td>
+                    <td>{{ order.product0_quantity }}</td>
+                    <td>{{ order.product0_price }}</td>
+                    <td >{{ order.reason }}</td>
+                    <td >{{ order.comment }}</td>
+                </tr>
+                {% endif %}
+                <!-- Product 1 -->
+                {% if order.product1_name %}
+                <tr>
+                    <td>{{ order.product1_name }}</td>
+                    <td>{{ order.product1_size }}</td>
+                    <td>{{ order.product1_quantity }}</td>
+                    <td>{{ order.product1_price }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
     </table>
 </body>
 </html>
