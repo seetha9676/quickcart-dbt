@@ -9,13 +9,14 @@ app = Flask(__name__)
 app.secret_key = 'whekjrherlwjerlwjerlkwejrkwensmend'
 
 # MySQL Connection Configuration
-
 db_config = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', ''),
-    'database': os.getenv('DB_NAME', 'quickcartdb')
+    'host': os.getenv('DB_HOST', 'sql3.freesqldatabase.com'),
+    'user': os.getenv('DB_USER', 'sql3751732'),
+    'password': os.getenv('DB_PASSWORD', 'MAjpadWRhi'),
+    'database': os.getenv('DB_NAME', 'sql3751732'),
+    'port': int(os.getenv('DB_PORT', 3306))
 }
+
 def get_db_connection():
     return connect(**db_config)
 
